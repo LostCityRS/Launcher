@@ -51,7 +51,7 @@ function createWindow() {
     });
 
     win.webContents.on('before-input-event', (event, input) => {
-        if (input.control) {
+        if (input.control && !input.alt) {
             if (input.key === '=') { // +
                 // zoom out
                 event.preventDefault();
