@@ -1,5 +1,5 @@
 const { URL } = require('url');
-const { app, BrowserWindow, Menu, powerSaveBlocker } = require('electron');
+const { app, BrowserWindow, dialog, Menu, powerSaveBlocker } = require('electron');
 const { updateElectronApp } = require('update-electron-app');
 const windowStateKeeper = require('electron-window-state');
 
@@ -47,6 +47,22 @@ function createWindow() {
             if (win.webContents.zoomFactor > 0.6) {
                 win.webContents.zoomFactor -= 0.1;
             }
+        }
+    });
+
+    win.webContents.on('will-prevent-unload', (event) => {
+        // Game engine attempts to prevent unload if user is logged in while
+        // navigating away. We forward event here to our UI shell.
+        const choice = dialog.showMessageBoxSync(win, {
+            type: 'question',
+            buttons: ['Exit', 'Stay'],
+            title: 'Do you want to exit the game?',
+            message: 'You appear to still be logged in.',
+            defaultId: 0,
+            cancelId: 1
+        });
+        if (choice === 0) {
+            event.preventDefault();
         }
     });
 
